@@ -54,6 +54,12 @@ contract BuyContract is Utils, Withdrawable {
     }
     
     
+    function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) pure 
+    {
+        require(_beneficiary != address(0));
+        require(_weiAmount != 0);
+    }
+    
     /**
    * @dev low level token purchase ***DO NOT OVERRIDE***
    * @param _beneficiary Address performing the token purchase
@@ -61,10 +67,16 @@ contract BuyContract is Utils, Withdrawable {
     function buyTokens(address _beneficiary) public payable {
 
     uint256 weiAmount = msg.value;
-    // _preValidatePurchase(_beneficiary, weiAmount);
+    _preValidatePurchase(_beneficiary, weiAmount);
 
-    // calculate token amount to be created
+    // calculate token amount to buy
     uint256 tokens = getTokenQty(weiAmount);
+    
+    //check if the token amount is bigger or equal to buy qtyToBuy
+    if(qtyToBuy>tokens)
+    {
+        qtyToBuy = tokens;
+    }
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
@@ -74,12 +86,13 @@ contract BuyContract is Utils, Withdrawable {
     
     
     // TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
-
     // _updatePurchasingState(_beneficiary, weiAmount);
 
      _forwardFunds();
     // _postValidatePurchase(_beneficiary, weiAmount);
   }
+  
+
   
   /**
    * @dev Overrides Crowdsale fund forwarding, sending funds to vault.
