@@ -49,7 +49,7 @@ contract TradeEngine is Ownable, Withdrawable, Utils {
         for (uint i = 0; i <= buyContracts.getNumberOfContracts(_token) ; i++) {
              
                 BuyContract buyContract = buyContracts.getBuyContract(_token,i);
-                if (lastSellContract.qtyToSell() == buyContract.qtyToBuy() ) {
+                if ((lastSellContract.qtyToSell() == buyContract.qtyToBuy() && lastSellContract.getSellRate()<=buyContract.getBaseBuyRate())) {
                     return (true,buyContract,lastSellContract);
                     break;
                 }
@@ -67,7 +67,7 @@ contract TradeEngine is Ownable, Withdrawable, Utils {
         for (uint i = 0; i <= sellContracts.getNumberOfContracts(_token) ; i++) {
              
                 SellContract sellContract = sellContracts.getSellContract(_token,i);
-                if (lastBuyContract.qtyToBuy() == sellContract.qtyToSell() ) {
+                if ((lastBuyContract.qtyToBuy() == sellContract.qtyToSell()) && (lastBuyContract.getBaseBuyRate() >= sellContract.getSellRate()))  {
                     return (true,lastBuyContract,sellContract);
                     break;
                 }
